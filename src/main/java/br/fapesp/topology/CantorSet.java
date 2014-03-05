@@ -2,6 +2,8 @@ package br.fapesp.topology;
 
 import java.util.Random;
 
+import br.fapesp.myutils.MyUtils;
+
 public class CantorSet {
 	
 	private static double[] f1_26(double[] x) {
@@ -49,6 +51,15 @@ public class CantorSet {
 		}
 		
 		return x;
+	}
+	
+	public static void main(String[] args) {
+		if (args.length != 2) {
+			System.out.println("Usage: CantorSet Npoints seed");
+			System.exit(0);
+		}
+		double[][] data = genCantorSet26(Integer.parseInt(args[0]), Long.parseLong(args[1]));
+		MyUtils.print_matrix(data);
 	}
 
 }
