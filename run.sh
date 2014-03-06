@@ -8,6 +8,7 @@ fi
 # run analysis:
 echo "Running analysis..."
 #MAVEN_OPTS="-Xmx1024m" mvn exec:java -Dexec.mainClass="br.fapesp.topology.TopologyAnalysis" -Dexec.args="cantor.dat"
-MAVEN_OPTS="-Xmx1024m" mvn -q exec:java -Dexec.mainClass="br.fapesp.topology.TopologyAnalysis" -Dexec.args="cantor.dat" > results.dat
+export MAVEN_OPTS="-Xmx1024m"
+time mvn -q -e exec:java -Dexec.mainClass="br.fapesp.topology.TopologyAnalysis" -Dexec.args="cantor.dat" > results.dat
 
 
