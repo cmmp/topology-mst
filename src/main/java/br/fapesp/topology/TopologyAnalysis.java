@@ -24,12 +24,12 @@ public class TopologyAnalysis {
 	 * properties of its connectivity.
 	 * 
 	 * @param data a finite point-set cloud
-	 * @return a matrix with the following columns: x, Ce, De, Ie, Coefs
+	 * @return a matrix with the following columns: eps, Ce, De, Ie, Coefs
 	 * The first row of the coefficients column contains the gamma coefficient, and the
 	 * second row contains the delta coefficient.
 	 * 
 	 */
-	public double[][] analysis(double[][] data) {
+	public static double[][] analysis(double[][] data) {
 		// create an exponential series because when its log is computed
 		// we get linearly spaced points.
 		double[] epsValues = MyUtils.genExpSeries(2, 20);
