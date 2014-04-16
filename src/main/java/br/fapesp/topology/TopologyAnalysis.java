@@ -24,15 +24,21 @@ public class TopologyAnalysis {
 	 * properties of its connectivity.
 	 * 
 	 * @param data a finite point-set cloud
+	 * @param mineps the minimum eps value for analysis
+	 * @param maxeps the maximum eps value for analysis
+	 * @param nsteps the number of elements from mineps to maxeps: 
+	 * 		20 is a good number usually. Be advised the generated series will 
+	 * 		present exponential growth, so it becomes linear when log is taken
+	 * 		to compute coefficients.
 	 * @return a matrix with the following columns: eps, Ce, De, Ie, Coefs
 	 * The first row of the coefficients column contains the gamma coefficient, and the
 	 * second row contains the delta coefficient.
 	 * 
 	 */
-	public static double[][] analysis(double[][] data) {
+	public static double[][] analysis(double[][] data, double mineps, double maxeps, int nsteps) {
 		// create an exponential series because when its log is computed
 		// we get linearly spaced points.
-		double[] epsValues = MyUtils.genExpSeries(2, 20);
+		double[] epsValues = MyUtils.genExpSeries(2, nsteps);
 		
 		int Nx = epsValues.length;
 		
@@ -44,7 +50,7 @@ public class TopologyAnalysis {
 		double[][] results = new double[Nx][5];
 		
 		// put the exponential series in the desired range:
-		epsValues = MyUtils.rescaleToRange(epsValues, 1e-5, 1.0);
+		epsValues = MyUtils.rescaleToRange(epsValues, mineps, maxeps);
 		
 		double[][] D = MyUtils.getEuclideanMatrix(data);
 		int[][] mst = MyUtils.fastPrim(data, D);
@@ -189,11 +195,9 @@ public class TopologyAnalysis {
 			System.exit(0);
 		}
 		
-		TopologyAnalysis ta = new TopologyAnalysis();
-		
 		double[][] data = MyUtils.readCSVdataSet(args[0], false, ' ');
 		
-		double[][] results = ta.analysis(data);
+		double[][] results = TopologyAnalysis.analysis(data, 1e-5, 1.0, 20);
 		
 		MyUtils.print_matrix(results);
 	}

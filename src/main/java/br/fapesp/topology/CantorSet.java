@@ -24,6 +24,11 @@ public class CantorSet {
 	 * PhD thesis: "Computational Topology at Multiple Resolutions: Foundations and
 	 * Applications to Fractals and Dynamics".
 	 * 
+	 * Expected value for gamma is log3/log2 ~ 1.58
+	 * Expected value for delta is 1.0
+	 * 
+	 * See pages 31 and 32 of her thesis.
+	 * 
 	 * @param N the number of points to generate
 	 * @param seed the seed for the RNG
 	 * @return a 2-d cantor set data set
