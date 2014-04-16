@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 from pylab import *
+import sys
 
-X = loadtxt("results.dat")
+X = loadtxt(sys.argv[1])
 
 epsvals = X[:,0]
 Ces = X[:,1]
