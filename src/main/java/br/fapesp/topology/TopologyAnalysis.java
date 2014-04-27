@@ -38,7 +38,8 @@ public class TopologyAnalysis {
 	public static double[][] analysis(double[][] data, double mineps, double maxeps, int nsteps) {
 		// create an exponential series because when its log is computed
 		// we get linearly spaced points.
-		double[] epsValues = MyUtils.genExpSeries(2, nsteps);
+		//double[] epsValues = MyUtils.genExpSeries(2, nsteps);
+		double[] epsValues = MyUtils.linspace(mineps, maxeps, nsteps);
 		
 		int Nx = epsValues.length;
 		
@@ -50,7 +51,7 @@ public class TopologyAnalysis {
 		double[][] results = new double[Nx][5];
 		
 		// put the exponential series in the desired range:
-		epsValues = MyUtils.rescaleToRange(epsValues, mineps, maxeps);
+		//epsValues = MyUtils.rescaleToRange(epsValues, mineps, maxeps);
 		
 		double[][] D = MyUtils.getEuclideanMatrix(data);
 		int[][] mst = MyUtils.fastPrim(data, D);
