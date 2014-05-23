@@ -241,7 +241,8 @@ public class TopologyAnalysis {
 		}
 		
 		double[][] D = MyUtils.getEuclideanMatrix(data);
-		double[] epsValues = MyUtils.linspace(getMinGreaterThanZero(D), MyUtils.getMatrixMax(D), nsteps);
+		//double[] epsValues = MyUtils.linspace(getMinGreaterThanZero(D), MyUtils.getMatrixMax(D), nsteps);
+		double[] epsValues = MyUtils.expspace(getMinGreaterThanZero(D), MyUtils.getMatrixMax(D), nsteps);
 		
 		int Nx = epsValues.length;
 		
