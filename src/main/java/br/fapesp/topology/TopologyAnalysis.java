@@ -20,6 +20,8 @@ import br.fapesp.myutils.MyUtils;
  */
 public class TopologyAnalysis {
 	
+	private static final Random RNG = new Random(1234);
+	
 	/**
 	 * Runs a topological analysis on the data, returning
 	 * properties of its connectivity.
@@ -219,7 +221,6 @@ public class TopologyAnalysis {
 		// create an exponential series because when its log is computed
 		// we get linearly spaced points.
 		//double[] epsValues = MyUtils.genExpSeries(2, nsteps);
-		Random rng = new Random(1234); 
 		
 		// put the exponential series in the desired range:
 		//epsValues = MyUtils.rescaleToRange(epsValues, mineps, maxeps);
@@ -232,9 +233,9 @@ public class TopologyAnalysis {
 			// synthesize new data adding a small jitter
 			for(int i = data.length; i < newdata.length; i++) {
 				// pick a random object from the original data
-				int pick = rng.nextInt(data.length);
+				int pick = RNG.nextInt(data.length);
 				for (int j = 0; j < data[0].length; j++)
-					newdata[i][j] = data[pick][j] + rng.nextGaussian() / 100.0; // add a N(0,0.25) value
+					newdata[i][j] = data[pick][j] + RNG.nextGaussian() / 100.0; // add a N(0,0.25) value
 			}
 			data = newdata;
 		}
