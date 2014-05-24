@@ -385,10 +385,8 @@ public class TopologyAnalysis {
 				break;
 			if(results[j][1] == 1.0)
 				reachedOneConnectedComponent = true;
-			if (results[j][3] < 0.9 * N) {
 				gammaReg.addData(results[j][0], results[j][1]);
 				deltaReg.addData(results[j][0], results[j][2]);
-			}
 		}
 		
 		results[0][4] = gammaReg.getSlope();
