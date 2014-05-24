@@ -386,8 +386,8 @@ public class TopologyAnalysis {
 			if(results[j][1] == 1.0)
 				reachedOneConnectedComponent = true;
 			if (results[j][3] < 0.9 * N) {
-				gammaReg.addData(Math.log(1.0 / results[j][0]), Math.log(results[j][1]));
-				deltaReg.addData(Math.log(results[j][0]), Math.log(results[j][2]));
+				gammaReg.addData(results[j][0], results[j][1]);
+				deltaReg.addData(results[j][0], results[j][2]);
 			}
 		}
 		
