@@ -375,6 +375,7 @@ public class TopologyAnalysis {
 		// compute gamma and delta coefficients:
 		SimpleRegression gammaReg = new SimpleRegression();
 		SimpleRegression deltaReg = new SimpleRegression();
+		SimpleRegression betaReg = new SimpleRegression();
 		
 		// only add to the regression while the number of connected components
 		// is changing. Once it reaches 1.0, stop adding more points.
@@ -387,10 +388,12 @@ public class TopologyAnalysis {
 				reachedOneConnectedComponent = true;
 				gammaReg.addData(results[j][0], results[j][1]);
 				deltaReg.addData(results[j][0], results[j][2]);
+				betaReg.addData(results[j][0], results[j][3]);
 		}
 		
 		results[0][4] = gammaReg.getSlope();
 		results[1][4] = deltaReg.getSlope();
+		results[2][4] = betaReg.getSlope();
 		
 		return results;
 	}
