@@ -2,6 +2,7 @@ package br.fapesp.topology;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -375,6 +376,7 @@ public class TopologyAnalysis {
 		// compute gamma and delta coefficients:
 		SimpleRegression gammaReg = new SimpleRegression();
 		SimpleRegression deltaReg = new SimpleRegression();
+		SimpleRegression betaReg = new SimpleRegression();
 		
 		// only add to the regression while the number of connected components
 		// is changing. Once it reaches 1.0, stop adding more points.
@@ -391,6 +393,32 @@ public class TopologyAnalysis {
 		
 		results[0][4] = gammaReg.getSlope();
 		results[1][4] = deltaReg.getSlope();
+		
+		
+		// compute a coefficient that is the slope of the line
+		// of the distances between points:
+		int k = 0;
+		ArrayList<Double> flatD = new ArrayList<Double>();
+		
+		for(i = 0; i < D.length - 1; i++) {
+			for(int j = i + 1; j < D.length; j++) {
+				if(D[i][j] > 1e-4)
+					flatD.add(D[i][j]);
+			}
+		}
+		Collections.sort(flatD);
+		
+		double alpha = 0.0;
+		
+		for(i = 0; i < flatD.size(); i++) {
+			betaReg.addData(i, flatD.get(i));
+			alpha += flatD.get(i);
+		}
+		
+		results[2][4] = betaReg.getSlope();
+		results[3][4] = alpha / flatD.size();
+		// compute alpha - mean inter point distance
+		
 		
 		return results;
 	}
