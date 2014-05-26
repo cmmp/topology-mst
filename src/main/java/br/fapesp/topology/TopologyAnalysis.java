@@ -221,28 +221,8 @@ public class TopologyAnalysis {
 	public static double[][] analysis(double[][] data, int nsteps) {
 		// create an exponential series because when its log is computed
 		// we get linearly spaced points.
-		//double[] epsValues = MyUtils.genExpSeries(2, nsteps);
-		
-		// put the exponential series in the desired range:
-		//epsValues = MyUtils.rescaleToRange(epsValues, mineps, maxeps);
-		
-//		if (data.length < 10) { // we need to synthesize more data, otherwise estimation is very poor
-//			int PADDING = 20; // how much new data we synthesize
-//			double[][] newdata = new double[data.length + PADDING][data[0].length];
-//			for(int i = 0; i < data.length; i++)
-//				System.arraycopy(data[i], 0, newdata[i], 0, data[0].length);
-//			// synthesize new data adding a small jitter
-//			for(int i = data.length; i < newdata.length; i++) {
-//				// pick a random object from the original data
-//				int pick = RNG.nextInt(data.length);
-//				for (int j = 0; j < data[0].length; j++)
-//					newdata[i][j] = data[pick][j] + RNG.nextGaussian() / 100.0; // add a N(0,0.25) value
-//			}
-//			data = newdata;
-//		}
 		
 		double[][] D = MyUtils.getEuclideanMatrix(data);
-		//double[] epsValues = MyUtils.linspace(getMinGreaterThanZero(D), MyUtils.getMatrixMax(D), nsteps);
 		double[] epsValues = MyUtils.expspace(getMinGreaterThanZero(D), MyUtils.getMatrixMax(D), nsteps);
 		
 		int Nx = epsValues.length;
