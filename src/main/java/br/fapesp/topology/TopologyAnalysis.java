@@ -2,6 +2,7 @@ package br.fapesp.topology;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,8 +43,7 @@ public class TopologyAnalysis {
 	public static double[][] analysis(double[][] data, double mineps, double maxeps, int nsteps) {
 		// create an exponential series because when its log is computed
 		// we get linearly spaced points.
-		//double[] epsValues = MyUtils.genExpSeries(2, nsteps);
-		double[] epsValues = MyUtils.linspace(mineps, maxeps, nsteps);
+		double[] epsValues = MyUtils.genExpSeries(2, nsteps);
 		
 		int Nx = epsValues.length;
 		
@@ -232,7 +232,7 @@ public class TopologyAnalysis {
 		// the Coefs column has only two elements:
 		// in the first row, the gamma coefficient and, in the second row,
 		// the delta coefficient
-		double[][] results = new double[Nx][5];
+		double[][] results = new double[Nx][6];
 				
 		int[][] mst = MyUtils.fastPrim(data, D);
 		ArrayList<Edge> cmst = new ArrayList<Edge>();
@@ -372,6 +372,32 @@ public class TopologyAnalysis {
 		
 		results[0][4] = gammaReg.getSlope();
 		results[1][4] = deltaReg.getSlope();
+		
+		// compute average number of k-neighbors:
+		double eps;
+		double[] dists = new double[D.length - 1];
+		
+		SimpleRegression kdistReg = new SimpleRegression();
+		
+		for (i = 0; i < results.length; i++) {
+			eps = results[i][0];
+			for (int j = 0; j < D.length; j++) {
+				System.arraycopy(D[j], 1, dists, 0, D.length - 1);
+				Arrays.sort(dists);
+				for(int k = 0; k < dists.length; k++) {
+					if(dists[k] <= eps)
+						results[i][5]++;
+					else
+						break;
+				}
+				results[i][5] /= D.length;
+			}
+		}
+		
+		for(i = 0; i < results.length; i++)
+			kdistReg.addData(results[i][0], results[i][5]);
+		
+		results[2][4] = kdistReg.getSlope();
 		
 		return results;
 	}
