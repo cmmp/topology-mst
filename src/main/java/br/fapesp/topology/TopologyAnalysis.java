@@ -10,6 +10,10 @@ import java.util.Random;
 
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
+import edu.stanford.math.plex.EuclideanArrayData;
+import edu.stanford.math.plex.Plex;
+import edu.stanford.math.plex.RipsStream;
+import edu.stanford.math.plex.PersistenceInterval.Float;
 import br.fapesp.myutils.MyUtils;
 
 /**
@@ -201,6 +205,45 @@ public class TopologyAnalysis {
 				if(matrix[i][j] < min && matrix[i][j] > 0)
 					min = matrix[i][j];
 		return min;
+	}
+	
+	/**
+	 * Runs a Vietoris-Rips filtration analysis
+	 * @param data
+	 * @return
+	 */
+	public static double[][] filtrationAnalysis(double[][] data) {
+		double[][] D = MyUtils.getEuclideanMatrix(data);
+		
+		EuclideanArrayData euc = new EuclideanArrayData(data);
+		
+		double delta = 0.001; // step size
+		int max_d = 2;
+		double max_dist = MyUtils.getMatrixMax(D);
+		
+		RipsStream rips = Plex.RipsStream(delta, max_d, max_dist, euc);
+		
+		Float[] persistence = Plex.Persistence().computeIntervals(rips);
+		
+		double[][] results = new double[1][2];
+		
+		int n1dholes = 0;
+		double maxHoleLifeTime = 0;
+		double lifetime;
+		
+		for(int i = 0; i < persistence.length; i++) {
+			if(persistence[i].dimension == 1) {
+				n1dholes++;
+				lifetime = persistence[i].end - persistence[i].start; 
+				if(lifetime > maxHoleLifeTime)
+					maxHoleLifeTime = lifetime;
+			}
+		}
+		
+		results[0][0] = n1dholes;
+		results[0][1] = maxHoleLifeTime;
+		
+		return results;
 	}
 	
 	/**
