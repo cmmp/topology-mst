@@ -32,6 +32,7 @@ public class TopologyAnalysis {
 	 * Runs a topological analysis on the data, returning
 	 * properties of its connectivity.
 	 * 
+	 * @deprecated This works well for batch, but not so good with streams
 	 * @param data a finite point-set cloud
 	 * @param mineps the minimum eps value for analysis
 	 * @param maxeps the maximum eps value for analysis
@@ -209,10 +210,10 @@ public class TopologyAnalysis {
 	
 	/**
 	 * Runs a Vietoris-Rips filtration analysis
-	 * @param data
-	 * @return
+	 * @param data data set with one example in each row
+	 * @return a filtration analysis result
 	 */
-	public static double[][] filtrationAnalysis(double[][] data) {
+	public static FiltrationResult filtrationAnalysis(double[][] data) {
 		double[][] D = MyUtils.getEuclideanMatrix(data);
 		
 		EuclideanArrayData euc = new EuclideanArrayData(data);
@@ -224,8 +225,6 @@ public class TopologyAnalysis {
 		RipsStream rips = Plex.RipsStream(delta, max_d, max_dist, euc);
 		
 		Float[] persistence = Plex.Persistence().computeIntervals(rips);
-		
-		double[][] results = new double[1][2];
 		
 		int n1dholes = 0;
 		double maxHoleLifeTime = 0;
@@ -240,10 +239,11 @@ public class TopologyAnalysis {
 			}
 		}
 		
-		results[0][0] = n1dholes;
-		results[0][1] = maxHoleLifeTime;
+		FiltrationResult fr = new FiltrationResult();
+		fr.maxHoleLifeTime = maxHoleLifeTime;
+		fr.n1dholes = n1dholes;
 		
-		return results;
+		return fr;
 	}
 	
 	/**
@@ -253,6 +253,7 @@ public class TopologyAnalysis {
 	 * Mineps and maxeps are determined automatically in this version
 	 * via the dissimilarity matrix.
 	 * 
+	 * @deprecated does not work so well in streams scenario
 	 * @param data a finite point-set cloud
 	 * @param nsteps the number of elements from mineps to maxeps: 
 	 * 		20 is a good number usually.
