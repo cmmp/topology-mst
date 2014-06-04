@@ -2,7 +2,14 @@ package br.fapesp.topology;
 
 public class FiltrationResult {
 
-	public double maxHoleLifeTime;
-	public double n1dholes;
+	/**
+	 * number of N dimensional holes, starting from 0 (connected components), holes, voids, etc.
+	 */
+	public int[] nDholes;
 	
+	/**
+	 * maximum lifetime of an N-dimensional hole, starting from 0.
+	 */
+	public double[] maxHoleLifeTime;
+
 }

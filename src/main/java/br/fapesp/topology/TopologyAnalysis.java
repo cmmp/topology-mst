@@ -226,22 +226,22 @@ public class TopologyAnalysis {
 		
 		Float[] persistence = Plex.Persistence().computeIntervals(rips);
 		
-		int n1dholes = 0;
-		double maxHoleLifeTime = 0;
-		double lifetime;
+		int[] ndHoles = new int[max_d];
+		double[] maxHoleLifeTime = new double[max_d];
+		double lf;
+		int dim;
 		
 		for(int i = 0; i < persistence.length; i++) {
-			if(persistence[i].dimension == 1) {
-				n1dholes++;
-				lifetime = persistence[i].end - persistence[i].start; 
-				if(lifetime > maxHoleLifeTime)
-					maxHoleLifeTime = lifetime;
-			}
+			dim = persistence[i].dimension;
+			lf = persistence[i].end - persistence[i].start;
+			if (lf > maxHoleLifeTime[dim])
+				maxHoleLifeTime[dim] = lf;
+			ndHoles[dim]++;
 		}
 		
 		FiltrationResult fr = new FiltrationResult();
+		fr.nDholes = ndHoles;
 		fr.maxHoleLifeTime = maxHoleLifeTime;
-		fr.n1dholes = n1dholes;
 		
 		return fr;
 	}
