@@ -219,7 +219,7 @@ public class TopologyAnalysis {
 		EuclideanArrayData euc = new EuclideanArrayData(data);
 		
 		double delta = 0.001; // step size
-		int max_d = 2;
+		int max_d = 3;
 		double max_dist = MyUtils.getMatrixMax(D);
 		
 		RipsStream rips = Plex.RipsStream(delta, max_d, max_dist, euc);
@@ -236,6 +236,8 @@ public class TopologyAnalysis {
 			lf = persistence[i].end - persistence[i].start;
 			if (lf > maxHoleLifeTime[dim])
 				maxHoleLifeTime[dim] = lf;
+			if (Double.isInfinite(lf))
+				maxHoleLifeTime[dim] = max_dist;
 			ndHoles[dim]++;
 		}
 		
