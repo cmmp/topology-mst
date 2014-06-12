@@ -11,5 +11,10 @@ public class FiltrationResult {
 	 * maximum lifetime of an N-dimensional hole, starting from 0.
 	 */
 	public double[] maxHoleLifeTime;
+	
+	/**
+	 * average lifetime of a N-dimensional hole
+	 */
+	public double[] averageHoleLifeTime;
 
 }

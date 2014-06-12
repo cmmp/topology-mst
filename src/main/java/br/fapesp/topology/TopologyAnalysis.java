@@ -228,12 +228,14 @@ public class TopologyAnalysis {
 		
 		int[] ndHoles = new int[max_d];
 		double[] maxHoleLifeTime = new double[max_d];
+		double[] averageHoleLifeTime = new double[max_d];
 		double lf;
 		int dim;
 		
 		for(int i = 0; i < persistence.length; i++) {
 			dim = persistence[i].dimension;
 			lf = persistence[i].end - persistence[i].start;
+			averageHoleLifeTime[dim] += lf;
 			if (lf > maxHoleLifeTime[dim])
 				maxHoleLifeTime[dim] = lf;
 			if (Double.isInfinite(lf))
@@ -241,9 +243,13 @@ public class TopologyAnalysis {
 			ndHoles[dim]++;
 		}
 		
+		for(int i = 0; i < max_d; i++)
+			averageHoleLifeTime[i] /= ndHoles[i];
+		
 		FiltrationResult fr = new FiltrationResult();
 		fr.nDholes = ndHoles;
 		fr.maxHoleLifeTime = maxHoleLifeTime;
+		fr.averageHoleLifeTime = averageHoleLifeTime;
 		
 		return fr;
 	}
