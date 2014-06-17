@@ -13,6 +13,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 import edu.stanford.math.plex.EuclideanArrayData;
 import edu.stanford.math.plex.Plex;
 import edu.stanford.math.plex.RipsStream;
+import edu.stanford.math.plex.WitnessStream;
 import edu.stanford.math.plex.PersistenceInterval.Float;
 import br.fapesp.myutils.MyUtils;
 
@@ -213,20 +214,32 @@ public class TopologyAnalysis {
 	 * @param data data set with one example in each row
 	 * @return a filtration analysis result
 	 */
-	public static FiltrationResult filtrationAnalysis(double[][] data) {
-		double[][] D = MyUtils.getEuclideanMatrix(data);
+	public static FiltrationResult filtrationAnalysis(double[][] data, double threshold) {
+		//double[][] D = MyUtils.getEuclideanMatrix(data);
 		
 		EuclideanArrayData euc = new EuclideanArrayData(data);
 		
-		double delta = 0.001; // step size
-		int max_d = 3;
-		double max_dist = MyUtils.getMatrixMax(D);
+		double delta = 0.1; // step size
+		//System.out.println("data[0]len = " + data[0].length);
+		//System.out.println("data len = " + data.length);
+		int max_d = 2;
+		double max_dist = 5.0; //MyUtils.getMatrixMax(D);
+		System.out.println("max_dist = " + max_dist);
 		
-		RipsStream rips = Plex.RipsStream(delta, max_d, max_dist, euc);
+		int nLandmarks = data.length / 5;
 		
+		int[] possibilities = MyUtils.genIntSeries(0, data.length);
+		
+		int[] landmarks = MyUtils.sampleWithoutReplacement(possibilities, nLandmarks, null, 1234);
+		
+		//RipsStream rips = Plex.RipsStream(delta, max_d, max_dist, euc);
+		WitnessStream rips = Plex.WitnessStream(delta, max_d, max_dist, landmarks, euc);
+		
+		//System.out.println("got rips stream");
 		Float[] persistence = Plex.Persistence().computeIntervals(rips);
-		
+		//System.out.println("computed persistence intervals..");
 		int[] ndHoles = new int[max_d];
+		int[] ndRelevantHoles = new int[max_d];
 		double[] maxHoleLifeTime = new double[max_d];
 		double[] averageHoleLifeTime = new double[max_d];
 		double lf;
@@ -236,6 +249,8 @@ public class TopologyAnalysis {
 			dim = persistence[i].dimension;
 			lf = persistence[i].end - persistence[i].start;
 			averageHoleLifeTime[dim] += lf;
+			if (lf >= threshold)
+				ndRelevantHoles[dim]++;
 			if (lf > maxHoleLifeTime[dim])
 				maxHoleLifeTime[dim] = lf;
 			if (Double.isInfinite(lf))
@@ -250,6 +265,7 @@ public class TopologyAnalysis {
 		fr.nDholes = ndHoles;
 		fr.maxHoleLifeTime = maxHoleLifeTime;
 		fr.averageHoleLifeTime = averageHoleLifeTime;
+		fr.nDrelevantHoles = ndRelevantHoles;
 		
 		return fr;
 	}

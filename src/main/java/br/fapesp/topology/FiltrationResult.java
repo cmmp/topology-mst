@@ -16,5 +16,10 @@ public class FiltrationResult {
 	 * average lifetime of a N-dimensional hole
 	 */
 	public double[] averageHoleLifeTime;
+	
+	/**
+	 * get the number of revelant holes based on a user-defined threshold
+	 */
+	public int[] nDrelevantHoles;
 
 }
