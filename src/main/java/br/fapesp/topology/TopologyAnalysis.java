@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
+import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import edu.stanford.math.plex.EuclideanArrayData;
@@ -28,6 +29,12 @@ import br.fapesp.myutils.MyUtils;
 public class TopologyAnalysis {
 	
 	private static final Random RNG = new Random(1234);
+    private static final RandomDataGenerator crng = new RandomDataGenerator();
+    private static final boolean DEBUG = false;
+
+    static {
+        crng.reSeed(1234);
+    }
 	
 	/**
 	 * Runs a topological analysis on the data, returning
@@ -208,6 +215,66 @@ public class TopologyAnalysis {
 					min = matrix[i][j];
 		return min;
 	}
+
+    /**
+     * Select landmarks points according to the min-max algorithm
+     * described by V. Silva and G. Carlsson: Topological estimation
+     * using witness complexes (2004).
+     *
+     * @param data original data set
+     * @param nland number of landmarks
+     * @return indices of the landmarks in data
+     */
+    private static int[] selectLandmarksByMaxMin(double[][] data, int nland) {
+        ArrayList<Integer> landmarks = new ArrayList<Integer>(nland);
+        boolean[] lactive = new boolean[data.length];
+
+
+        landmarks.add(RNG.nextInt(data.length)); // choose the first landmark at random
+        lactive[landmarks.get(0)] = true; // controls which points have been selected as landmarks
+
+        double[][] D = MyUtils.getEuclideanMatrix(data);
+        ArrayList<Double> dists = new ArrayList<Double>();
+        ArrayList<Integer> candidates = new ArrayList<Integer>();
+
+        for (int i = 1; i < nland; i++) {
+            dists.clear();
+            candidates.clear();
+
+            double d = Double.MAX_VALUE;
+
+            for (int j = 0; j < data.length; j++) {
+                if (!lactive[j]) {
+                    // this is not already a landmark
+                    candidates.add(j);
+                    // find the distance of this point to all landmarks and pick the minimum
+                    for(int k = 0; k < landmarks.size(); k++) {
+                        if (D[landmarks.get(k)][j] < d) {
+                            d = D[landmarks.get(k)][j];
+                        }
+                    }
+                    dists.add(d);
+                }
+            }
+
+            // select the candidate that maximizes: z = min{D(z,l_0), D(z,l_1), ..., D(z,l_n)}
+            int argmax = MyUtils.argMax(dists);
+            int l = candidates.get(argmax);
+            landmarks.add(l);
+            lactive[l] = true;
+        }
+
+        if (DEBUG) {
+            MyUtils.printRep('-', 80);
+            System.out.println("TopologyAnalysis.selectLandmarksByMaxMin");
+            for (int i = 0; i < landmarks.size(); i++)
+                MyUtils.print_array(data[landmarks.get(i)]);
+
+            MyUtils.printRep('-', 80);
+        }
+
+        return MyUtils.listToArrayInt(landmarks);
+    }
 	
 	/**
 	 * Runs a Vietoris-Rips filtration analysis
@@ -224,20 +291,21 @@ public class TopologyAnalysis {
 		//System.out.println("data len = " + data.length);
 		int max_d = 2;
 		double max_dist = 5.0; //MyUtils.getMatrixMax(D);
-		System.out.println("max_dist = " + max_dist);
+//		System.out.println("max_dist = " + max_dist);
 		
-		int nLandmarks = data.length / 5;
+		int nLandmarks = data.length / 20;
 		
 		int[] possibilities = MyUtils.genIntSeries(0, data.length);
-		
-		int[] landmarks = MyUtils.sampleWithoutReplacement(possibilities, nLandmarks, null, 1234);
-		
+//        int[] landmarks = MyUtils.sampleWithoutReplacement(possibilities, nLandmarks, null, 1234);
+        int[] landmarks = selectLandmarksByMaxMin(data, nLandmarks);
+
 		//RipsStream rips = Plex.RipsStream(delta, max_d, max_dist, euc);
+
 		WitnessStream rips = Plex.WitnessStream(delta, max_d, max_dist, landmarks, euc);
-		
-		//System.out.println("got rips stream");
-		Float[] persistence = Plex.Persistence().computeIntervals(rips);
-		//System.out.println("computed persistence intervals..");
+
+        Float[] persistence = Plex.Persistence().computeIntervals(rips);
+
+        //System.out.println("computed persistence intervals..");
 		int[] ndHoles = new int[max_d];
 		int[] ndRelevantHoles = new int[max_d];
 		double[] maxHoleLifeTime = new double[max_d];
@@ -260,6 +328,16 @@ public class TopologyAnalysis {
 		
 		for(int i = 0; i < max_d; i++)
 			averageHoleLifeTime[i] /= ndHoles[i];
+
+        if (DEBUG) {
+            MyUtils.printRep('-', 80);
+            System.out.println("I got the following points:");
+            for (int i = 0; i < data.length; i++) {
+                MyUtils.print_array(data[i]);
+            }
+            MyUtils.printRep('-', 80);
+            System.out.println("i got " + ndRelevantHoles[1] + " relevant 1-d holes.");
+        }
 		
 		FiltrationResult fr = new FiltrationResult();
 		fr.nDholes = ndHoles;
